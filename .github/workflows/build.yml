@@ -1,0 +1,32 @@
+name: Build surfboard aadblock ruleset
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 22 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Run ruleset builder
+        run: |
+          chmod +x build.sh
+          ./build.sh
+          cp adblock_build/ruleset.conf ruleset.conf
+
+      - name: Commit updated ruleset
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add ruleset.conf
+          git commit -m "Update adblock ruleset" || echo "No changes"
+          git push
