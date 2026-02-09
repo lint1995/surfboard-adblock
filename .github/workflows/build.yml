@@ -5,7 +5,7 @@ on:
     branches: [ main ]
   workflow_dispatch:
   schedule:
-    - cron: "0 22 * * *"  # optional: daily rebuild
+    - cron: "0 22 * * *"  # optional daily rebuild
 
 jobs:
   build:
@@ -14,8 +14,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true  # allows git push using GITHUB_TOKEN
 
       - name: Run ruleset builder
         run: |
@@ -23,15 +21,16 @@ jobs:
           ./build.sh
           cp adblock_build/ruleset.conf ruleset.conf
 
-      - name: Commit updated ruleset
+      - name: Push ruleset to public repo
+        env:
+          PUBLIC_REPO_TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
         run: |
+          echo "[*] Cloning public repo..."
+          git clone https://x-access-token:${PUBLIC_REPO_TOKEN}@github.com/lin1995/surfboard-adblock-public.git public-repo
+          cp adblock_build/ruleset.conf public-repo/ruleset.conf
+          cd public-repo
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add ruleset.conf
           git commit -m "Update adblock ruleset" || echo "No changes"
-
-      - name: Push updated ruleset using GITHUB_TOKEN
-        run: |
-          # Set remote URL with token
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git push origin main
