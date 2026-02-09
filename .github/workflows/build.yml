@@ -26,7 +26,7 @@ jobs:
           PUBLIC_REPO_TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
         run: |
           echo "[*] Cloning public repo..."
-          git clone https://x-access-token:${PUBLIC_REPO_TOKEN}@github.com/lin1995/surfboard-adblock-public.git public-repo
+          git clone https://x-access-token:${PUBLIC_REPO_TOKEN}@github.com/lin1995/surfboard-adblock-ruleset.git public-repo
           cp adblock_build/ruleset.conf public-repo/ruleset.conf
           cd public-repo
           git config user.name "github-actions"
