@@ -1,4 +1,4 @@
-name: Build surfboard aadblock ruleset
+name: Build surfboard adblock ruleset
 
 on:
   push:
