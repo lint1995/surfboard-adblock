@@ -5,7 +5,7 @@ on:
     branches: [ main ]
   workflow_dispatch:
   schedule:
-    - cron: "0 22 * * *"
+    - cron: "0 22 * * *"  # optional: daily rebuild
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: true
+          persist-credentials: true  # allows git push using GITHUB_TOKEN
 
       - name: Run ruleset builder
         run: |
@@ -29,4 +29,9 @@ jobs:
           git config user.email "github-actions@github.com"
           git add ruleset.conf
           git commit -m "Update adblock ruleset" || echo "No changes"
-          git push
+
+      - name: Push updated ruleset using GITHUB_TOKEN
+        run: |
+          # Set remote URL with token
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push origin main
